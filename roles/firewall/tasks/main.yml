@@ -1,0 +1,56 @@
+---
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+
+- name: Allow SSH from bastion
+  community.general.ufw:
+    rule: allow
+    src: "{{ firewall_bastion_ip }}"
+    port: "{{ firewall_ssh_port }}"
+    proto: tcp
+
+- name: Debug monitor01 hostvars
+  ansible.builtin.debug:
+    var: hostvars['monitor01']
+  run_once: true
+
+- name: Allow Node Exporter from monitor01
+  community.general.ufw:
+    rule: allow
+    src: "{{ hostvars['monitor01']['ansible_facts']['default_ipv4']['address'] }}"
+    port: "{{ firewall_node_exporter_port }}"
+    proto: tcp
+  when: inventory_hostname in groups['monitored']
+
+- name: Allow NFS from web01
+  community.general.ufw:
+    rule: allow
+    src: "{{ hostvars['web01']['ansible_facts']['default_ipv4']['address'] }}"
+    port: "{{ firewall_nfs_port }}"
+    proto: tcp
+  when: inventory_hostname == "storage01"
+
+- name: Allow NFS from monitor01
+  community.general.ufw:
+    rule: allow
+    src: "{{ hostvars['monitor01']['ansible_facts']['default_ipv4']['address'] }}"
+    port: "{{ firewall_nfs_port }}"
+    proto: tcp
+  when: inventory_hostname == "storage01"
+
+- name: Set default incoming policy
+  community.general.ufw:
+    direction: incoming
+    policy: "{{ firewall_default_incoming_policy }}"
+
+- name: Set default outgoing policy
+  community.general.ufw:
+    direction: outgoing
+    policy: "{{ firewall_default_outgoing_policy }}"
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled

@@ -1,0 +1,10 @@
+---
+nfs_export_root: /srv/storage
+
+nfs_exports:
+  - path: /srv/storage/shared
+    network: 192.168.122.0/24
+    options: rw,sync
+  - path: /srv/storage/projects
+    network: 192.168.122.0/24
+    options: rw,sync

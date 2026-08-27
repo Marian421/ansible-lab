@@ -1,0 +1,11 @@
+---
+nfs_server: storage01
+
+nfs_mounts:
+  - name: shared
+    export: /srv/storage/shared
+    mount_point: /mnt/shared
+
+  - name: projects
+    export: /srv/storage/projects
+    mount_point: /mnt/projects

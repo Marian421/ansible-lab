@@ -1,0 +1,6 @@
+---
+healthcheck_user: healthcheck
+healthcheck_script: /usr/local/bin/lab-healthcheck.sh
+healthcheck_service: lab-healthcheck.service
+healthcheck_timer: lab-healthcheck.timer
+developers_gid: 1003

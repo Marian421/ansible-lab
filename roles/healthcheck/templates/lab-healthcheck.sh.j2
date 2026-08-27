@@ -1,0 +1,99 @@
+#!/bin/bash
+
+FAILED=0
+
+echo "================================"
+echo " Lab Healthcheck"
+echo "================================"
+echo "Hostname: {{ ansible_facts['hostname'] }}"
+echo "OS: {{ ansible_facts['distribution'] }}"
+echo "IP address: {{ ansible_facts['default_ipv4']['address'] }}"
+echo "Role: {{ server_role }}"
+echo "Uptime: $(uptime -p)"
+echo "================================"
+
+check_disk() {
+    local disk_usage
+    local inode_usage
+
+    disk_usage=$(df / | awk 'NR==2 {gsub("%","",$5); print $5}')
+    inode_usage=$(df -i / | awk 'NR==2 {gsub("%","",$5); print $5}')
+
+    if [ "$disk_usage" -lt 90 ]; then
+        echo "PASS: root disk usage is ${disk_usage}%"
+    else
+        echo "FAIL: root disk usage is ${disk_usage}%"
+        FAILED=1
+    fi
+
+    if [ "$inode_usage" -lt 90 ]; then
+        echo "PASS: root inode usage is ${inode_usage}%"
+    else
+        echo "FAIL: root inode usage is ${inode_usage}%"
+        FAILED=1
+    fi
+}
+
+check_load() {
+    local load
+
+    load=$(awk '{print $1}' /proc/loadavg)
+    echo "INFO: 1-minute load average: $load"
+}
+
+check_service() {
+    local service="$1"
+
+    if systemctl is-active --quiet "$service"; then
+        echo "PASS: $service is running"
+    else
+        echo "FAIL: $service is not running"
+        FAILED=1
+    fi
+}
+
+check_nfs() {
+    local mounts=(
+        "/mnt/shared"
+        "/mnt/projects"
+    )
+
+    for mountpoint in "${mounts[@]}"; do
+
+        if ! findmnt -M "$mountpoint" -t nfs,nfs4 >/dev/null 2>&1; then
+            echo "FAIL: NFS mount $mountpoint is not mounted"
+            FAILED=1
+            continue
+        fi
+
+        if ls -A "$mountpoint" >/dev/null 2>&1; then
+            echo "PASS: NFS $mountpoint is mounted and accessible"
+        else
+            echo "FAIL: NFS $mountpoint is mounted but not accessible"
+            FAILED=1
+        fi
+
+    done
+}
+
+check_disk
+check_load
+check_service ssh
+
+{% if server_role in ["web", "monitoring"] %}
+check_nfs
+{% endif %}
+
+#{% if server_role == "web" %}
+#check_service nginx
+#{% endif %}
+
+echo "================================"
+
+if [ "$FAILED" -eq 0 ]; then
+    echo "Healthcheck: OK"
+    exit 0
+else
+    echo "Healthcheck: FAILED"
+    exit 1
+fi

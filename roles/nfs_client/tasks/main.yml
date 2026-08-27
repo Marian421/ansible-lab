@@ -1,0 +1,35 @@
+---
+- name: Install NFS client package
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+    update_cache: true
+
+- name: Ensure developers group exists
+  ansible.builtin.group:
+    name: developers
+    gid: "{{ developers_gid }}"
+    state: present
+
+- name: Ensure NFS test user exists
+  ansible.builtin.user:
+    name: nfsuser
+    groups: developers
+    append: true
+    create_home: true
+    state: present
+
+- name: Ensure NFS mount points exist
+  ansible.builtin.file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  loop: "{{ nfs_mounts }}"
+
+- name: Mount NFS exports
+  ansible.posix.mount:
+    path: "{{ item.mount_point }}"
+    src: "{{ nfs_server }}:{{ item.export }}"
+    fstype: nfs
+    opts: defaults
+    state: mounted
+  loop: "{{ nfs_mounts }}"

@@ -1,0 +1,36 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/identity
+#
+identity_groups:
+  - name: developers
+    gid: 1003
+
+identity_users:
+  - name: alice
+    uid: 1001
+    groups:
+      - developers
+
+  - name: bob
+    uid: 1002
+    groups:
+      - developers
+
+  - name: alex
+    uid: 1003
+    groups:
+      - developers
+
+  - name: nfsuser
+    uid: 1004
+    groups:
+      - developers
+
+identity_system_users:
+  - name: healthcheck
+    uid: 1100
+    groups:
+      - developers
+    shell: /usr/sbin/nologin
+    create_home: false

@@ -1,0 +1,13 @@
+---
+- name: Install Node Exporter
+  ansible.builtin.apt:
+    name: "{{ node_exporter_package }}"
+    state: present
+    update_cache: true
+  notify: Restart Node Exporter
+
+- name: Ensure Node Exporter is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ node_exporter_service }}"
+    enabled: true
+    state: started

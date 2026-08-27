@@ -1,0 +1,31 @@
+---
+# tasks file for roles/identity
+
+- name: Ensure groups exist
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid }}"
+    state: present
+  loop: "{{ identity_groups }}"
+
+- name: Ensure users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    groups: "{{ item.groups | join(',') }}"
+    append: true
+    state: present
+    create_home: true
+  loop: "{{ identity_users }}"
+
+- name: Ensure system users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    groups: "{{ item.groups | join(',') }}"
+    append: true
+    shell: "{{ item.shell }}"
+    create_home: "{{ item.create_home }}"
+    system: true
+    state: present
+  loop: "{{ identity_system_users }}"

@@ -1,0 +1,49 @@
+---
+- name: Manage lab servers
+  hosts: lab
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Show hostname
+      ansible.builtin.debug:
+        msg: "This server is {{ ansible_facts['hostname'] }}"
+  roles:
+    - healthcheck
+    - identity
+
+- name: Configure NFS server
+  hosts: storage
+  gather_facts: true
+  become: true
+
+  roles:
+    - nfs_server
+
+- name: Configure NFS clients
+  hosts: nfs_clients
+  gather_facts: true
+  become: true
+
+  roles:
+    - nfs_client
+
+- name: Install Node Exporter
+  hosts: monitored
+  become: true
+  roles:
+    - node_exporter
+
+
+- name: Install Prometheus
+  hosts: monitoring
+  become: true
+  roles:
+    - prometheus
+
+- name: Configure firewall
+  hosts: lab
+  gather_facts: true
+  become: true
+  roles:
+    - firewall

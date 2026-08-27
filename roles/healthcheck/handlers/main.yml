@@ -1,0 +1,17 @@
+---
+- name: Reload and restart healthcheck service
+  ansible.builtin.systemd_service:
+    name: "{{ healthcheck_service }}"
+    daemon_reload: true
+    state: restarted
+
+- name: Reload and restart healthcheck timer
+  ansible.builtin.systemd_service:
+    name: "{{ healthcheck_timer }}"
+    daemon_reload: true
+    state: restarted
+
+- name: Run healthcheck
+  ansible.builtin.systemd_service:
+   name: "{{ healthcheck_service }}"
+   state: started

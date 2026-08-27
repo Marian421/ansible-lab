@@ -1,0 +1,8 @@
+[Unit]
+Description=Lab server health check - change
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=healthcheck
+ExecStart=/usr/local/bin/lab-healthcheck.sh

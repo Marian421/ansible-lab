@@ -1,0 +1,31 @@
+---
+- name: Install NFS server package
+  ansible.builtin.apt:
+    name: nfs-kernel-server
+    state: present
+    update_cache: true
+
+- name: Ensure NFS export directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: developers
+    mode: '2770'
+  loop: "{{ nfs_exports }}"
+
+- name: Configure NFS exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reload NFS exports
+
+- name: Ensure NFS server is enabled and running
+  ansible.builtin.systemd_service:
+    name: nfs-server
+    enabled: true
+    state: started
