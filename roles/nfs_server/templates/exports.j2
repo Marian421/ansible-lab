@@ -1,5 +1,5 @@
 # Managed by Ansible
 
-{% for export in nfs_exports %}
+{% for export in nfs_server_nfs_exports %}
 {{ export.path }} {{ export.network }}({{ export.options }})
 {% endfor %}

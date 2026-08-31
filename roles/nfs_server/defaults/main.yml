@@ -1,7 +1,7 @@
 ---
-nfs_export_root: /srv/storage
+nfs_server_nfs_export_root: /srv/storage
 
-nfs_exports:
+nfs_server_nfs_exports:
   - path: /srv/storage/shared
     network: 192.168.122.0/24
     options: rw,sync

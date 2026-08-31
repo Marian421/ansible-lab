@@ -1,0 +1,33 @@
+# Ansible
+*.retry
+*.pyc
+__pycache__/
+*.log
+.ansible/
+
+# Temp files
+template.md
+
+# Ansible Vault
+*.vault_password
+vault_password.txt
+
+# Secrets - NEVER commit these
+group_vars/*_vault.yml
+host_vars/*_vault.yml
+*.vault
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temp
+/tmp/
+*.tmp

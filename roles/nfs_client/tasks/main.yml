@@ -19,17 +19,11 @@
     create_home: true
     state: present
 
-- name: Ensure NFS mount points exist
-  ansible.builtin.file:
-    path: "{{ item.mount_point }}"
-    state: directory
-  loop: "{{ nfs_mounts }}"
-
 - name: Mount NFS exports
   ansible.posix.mount:
     path: "{{ item.mount_point }}"
-    src: "{{ nfs_server }}:{{ item.export }}"
+    src: "{{ nfs_client_nfs_server }}:{{ item.export }}"
     fstype: nfs
     opts: defaults
     state: mounted
-  loop: "{{ nfs_mounts }}"
+  loop: "{{ nfs_client_nfs_mounts }}"

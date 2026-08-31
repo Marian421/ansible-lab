@@ -1,7 +1,7 @@
 ---
-nfs_server: storage01
+nfs_client_nfs_server: storage01
 
-nfs_mounts:
+nfs_client_nfs_mounts:
   - name: shared
     export: /srv/storage/shared
     mount_point: /mnt/shared

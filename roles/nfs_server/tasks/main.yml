@@ -12,7 +12,7 @@
     owner: root
     group: developers
     mode: '2770'
-  loop: "{{ nfs_exports }}"
+  loop: "{{ nfs_server_nfs_exports }}"
 
 - name: Configure NFS exports
   ansible.builtin.template:
