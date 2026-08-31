@@ -184,5 +184,28 @@ Each completed task is documented here as evidence of hands-on experience.
 
 ---
 
+### Ticket #2: Grafana Dashboards
+**Date:** 2026-08-30
+**Goal:** Install Grafana on monitor01, configure Prometheus data source, import Node Exporter dashboard
+**Status:** completed
+
+**What was done:**
+- Created `grafana` Ansible role with tasks, handlers, defaults, templates
+- Added Grafana repository with GPG key verification
+- Installed Grafana via apt
+- Configured Prometheus as default data source using Jinja2 template
+- Added Grafana play to `first-playbook.yml` targeting monitor01
+- Accessed Grafana via SSH tunnel (`ssh -L 3000:localhost:3000 monitor01`)
+- Imported Node Exporter Full dashboard (ID 1860)
+
+**What was learned:**
+- Installing software with Ansible requires multiple steps: GPG key, repository, package, service, configuration
+- `notify` handlers allow different actions for install vs config changes
+- Grafana provisioning files can be templated for idempotent configuration
+- SSH tunneling avoids opening ports in firewall for development access
+- Grafana and Prometheus on the same host can use `localhost` for data source URL
+
+---
+
 *This journal is updated after each completed ticket.*
 *Entries show real work done, not just theory.*

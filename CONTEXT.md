@@ -14,7 +14,7 @@ At the start of a new conversation, say:
 
 - **Last updated:** 2026-08-30
 - **Lab status:** working
-- **Active learning module:** Module 2 - Grafana dashboards (NEXT)
+- **Active learning module:** Module 3 - Alertmanager (NEXT)
 
 ## Lab Topology
 
@@ -35,6 +35,7 @@ At the start of a new conversation, say:
 - [x] Phase 6 - Firewall (UFW, default-deny inbound, source-restricted rules)
 - [x] Phase 7 - Identity role (users/groups with consistent UIDs across servers)
 - [x] Module 1 - ansible.cfg + ansible-lint
+- [x] Module 2 - Grafana dashboards
 
 ## Ansible Roles
 
@@ -67,7 +68,7 @@ At the start of a new conversation, say:
 | # | Module | Status |
 |---|--------|--------|
 | 1 | ansible.cfg + ansible-lint | completed |
-| 2 | Grafana dashboards | not started |
+| 2 | Grafana dashboards | completed |
 | 3 | Alertmanager | not started |
 | 4 | Centralized logging (rsyslog/journald remote) | not started |
 | 5 | Docker + Compose | not started |
@@ -88,3 +89,11 @@ At the start of a new conversation, say:
 - Fixed lint issues: removed boilerplate, added FQCNs, cleaned whitespace
 - Removed redundant NFS mount point creation task from nfs_client role
 - All servers ping successfully, playbook runs clean
+
+### Session 2 (cont) - 2026-08-30
+- Completed Module 2: Grafana dashboards
+- Created grafana Ansible role (GPG key, repo, package, service, datasource config)
+- Configured Prometheus as default data source via Jinja2 template
+- Added grafana play to playbook targeting monitor01
+- Accessed Grafana via SSH tunnel, imported Node Exporter Full dashboard (ID 1860)
+- ansible-lint still 5/5 stars

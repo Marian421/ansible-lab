@@ -41,6 +41,12 @@
   roles:
     - prometheus
 
+- name: Install Grafana
+  hosts: monitoring
+  become: true
+  roles:
+    - grafana
+
 - name: Configure firewall
   hosts: lab
   gather_facts: true

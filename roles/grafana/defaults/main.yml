@@ -1,0 +1,4 @@
+---
+
+grafana_datasource_url: http://localhost:9090
+grafana_datasource_configuration_file_path: /etc/grafana/provisioning/datasources/prometheus.yml
