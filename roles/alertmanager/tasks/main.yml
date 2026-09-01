@@ -1,0 +1,16 @@
+---
+
+- name: Install Alertmanager
+  ansible.builtin.apt:
+    name: prometheus-alertmanager
+    state: present
+  notify: Enable and start Alertmanager
+
+- name: Configure Alertmanager
+  ansible.builtin.template:
+    src: create-configuration.yml.j2
+    dest: "{{ alertmanager_configuration_path }}"
+    owner: prometheus
+    group: prometheus
+    mode: '0640'
+  notify: Restart Alertmanager

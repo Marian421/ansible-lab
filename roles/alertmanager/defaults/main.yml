@@ -1,0 +1,4 @@
+---
+
+alertmanager_configuration_path: /etc/prometheus/alertmanager.yml
+alertmanager_prometheus_rules: /etc/prometheus/rules/alert_rules.yml

@@ -207,5 +207,25 @@ Each completed task is documented here as evidence of hands-on experience.
 
 ---
 
+### Ticket #3: Alertmanager
+**Date:** 2026-08-30
+**Goal:** Install Alertmanager, create alert rules, connect Prometheus to Alertmanager
+**Status:** completed
+
+**What was done:**
+- Created `alertmanager` Ansible role (install, configure, handlers)
+- Created alert rules template with InstanceDown and DiskSpaceLow alerts
+- Updated Prometheus template to include `alerting` and `rule_files` sections
+- Added rules directory creation and rule validation (`promtool check rules`) to Prometheus role
+- Alertmanager accessible via SSH tunnel (`ssh -L 9093:localhost:9093 monitor01`)
+
+**What was learned:**
+- Alerting architecture: Prometheus evaluates rules → fires alerts → Alertmanager handles routing
+- `{% raw %}` blocks in Jinja2 templates preserve Prometheus's `{{ $labels.instance }}` syntax
+- `promtool check rules` validates alert rules before deploying
+- Variable naming convention: role variables should use role name as prefix (fixed `alertmanager_prometheus_rules` → `prometheus_rules_path`)
+
+---
+
 *This journal is updated after each completed ticket.*
 *Entries show real work done, not just theory.*

@@ -1,0 +1,12 @@
+---
+
+- name: Restart Alertmanager
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    state: restarted
+
+- name: Enable and start Alertmanager
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    enabled: true
+    state: started

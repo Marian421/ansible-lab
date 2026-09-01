@@ -47,6 +47,13 @@
   roles:
     - grafana
 
+- name: Install Alertmanager
+  hosts: monitoring
+  become: true
+  roles:
+    - alertmanager
+
+
 - name: Configure firewall
   hosts: lab
   gather_facts: true

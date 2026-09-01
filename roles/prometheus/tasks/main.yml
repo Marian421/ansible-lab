@@ -15,6 +15,24 @@
     mode: "0644"
   notify: Restart Prometheus
 
+- name: Create Prometheus rules directory
+  ansible.builtin.file:
+    path: /etc/prometheus/rules
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: Install Prometheus alert rules
+  ansible.builtin.template:
+    src: create-prometheus-rules.yml.j2
+    dest: /etc/prometheus/rules/alert_rules.yml
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+    validate: 'promtool check rules %s'
+  notify: Restart Prometheus
+
 - name: Ensure Prometheus is enabled and started
   ansible.builtin.systemd:
     name: "{{ prometheus_service }}"

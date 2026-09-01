@@ -14,7 +14,7 @@ At the start of a new conversation, say:
 
 - **Last updated:** 2026-08-30
 - **Lab status:** working
-- **Active learning module:** Module 3 - Alertmanager (NEXT)
+- **Active learning module:** Module 4 - Centralized logging (NEXT)
 
 ## Lab Topology
 
@@ -36,6 +36,7 @@ At the start of a new conversation, say:
 - [x] Phase 7 - Identity role (users/groups with consistent UIDs across servers)
 - [x] Module 1 - ansible.cfg + ansible-lint
 - [x] Module 2 - Grafana dashboards
+- [x] Module 3 - Alertmanager
 
 ## Ansible Roles
 
@@ -69,7 +70,7 @@ At the start of a new conversation, say:
 |---|--------|--------|
 | 1 | ansible.cfg + ansible-lint | completed |
 | 2 | Grafana dashboards | completed |
-| 3 | Alertmanager | not started |
+| 3 | Alertmanager | completed |
 | 4 | Centralized logging (rsyslog/journald remote) | not started |
 | 5 | Docker + Compose | not started |
 | 6 | GitHub Actions CI/CD | not started |
@@ -97,3 +98,11 @@ At the start of a new conversation, say:
 - Added grafana play to playbook targeting monitor01
 - Accessed Grafana via SSH tunnel, imported Node Exporter Full dashboard (ID 1860)
 - ansible-lint still 5/5 stars
+
+### Session 2 (cont) - 2026-08-30
+- Completed Module 3: Alertmanager
+- Created alertmanager Ansible role (install, configure, handlers)
+- Created alert rules template (InstanceDown, DiskSpaceLow)
+- Updated Prometheus template with alerting and rule_files sections
+- Fixed var-naming lint issue (role variable prefix convention)
+- ansible-lint back to 5/5 stars

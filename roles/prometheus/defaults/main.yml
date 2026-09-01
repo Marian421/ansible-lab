@@ -3,3 +3,4 @@
 prometheus_package: prometheus
 prometheus_service: prometheus
 prometheus_config: /etc/prometheus/prometheus.yml
+prometheus_rules: /etc/prometheus/rules/alert_rules.yml
