@@ -1,0 +1,53 @@
+---
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name: gpg
+    state: present
+    update_cache: true
+
+- name: Create Alloy directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ alloy_keyring_dir }}"
+    - "{{ alloy_configuration_dir }}"
+
+- name: Download Grafana GPG key
+  ansible.builtin.get_url:
+    url: "https://apt.grafana.com/gpg-full.key"
+    dest: "{{ alloy_keyring_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add Grafana APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ alloy_keyring_file }}] https://apt.grafana.com stable main"
+    filename: grafana
+    state: present
+
+- name: Install Alloy
+  ansible.builtin.apt:
+    name: alloy
+    state: present
+    update_cache: true
+
+- name: Create Alloy configuration
+  ansible.builtin.template:
+    src: alloy-configuration.yml.j2
+    dest: "{{ alloy_configuration_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Alloy
+
+- name: Enable and start Alloy
+  ansible.builtin.systemd_service:
+    name: alloy
+    enabled: true
+    state: started

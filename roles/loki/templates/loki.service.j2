@@ -1,0 +1,19 @@
+[Unit]
+Description=Grafana Loki
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+User={{ loki_user }}
+Group={{ loki_group }}
+
+ExecStart={{ loki_binary }} \
+  -config.file={{ loki_config_dir }}/config.yml
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -34,6 +34,12 @@
   roles:
     - node_exporter
 
+- name: Install Loki
+  hosts: monitoring
+  become: true
+  roles:
+    - loki
+
 
 - name: Install Prometheus
   hosts: monitoring
@@ -52,6 +58,12 @@
   become: true
   roles:
     - alertmanager
+
+- name: Install Alloy
+  hosts: monitored
+  become: true
+  roles:
+    - alloy
 
 
 - name: Configure firewall

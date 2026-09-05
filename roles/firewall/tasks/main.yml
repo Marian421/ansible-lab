@@ -41,6 +41,18 @@
     proto: tcp
   when: inventory_hostname == "storage01"
 
+
+- name: Allow Loki from lab servers
+  community.general.ufw:
+    rule: allow
+    src: "{{ item }}"
+    port: "{{ firewall_alloy_port }}"
+    proto: tcp
+  loop:
+    - "{{ hostvars['web01']['ansible_facts']['default_ipv4']['address'] }}"
+    - "{{ hostvars['storage01']['ansible_facts']['default_ipv4']['address'] }}"
+  when: inventory_hostname == 'monitor01'
+
 - name: Set default incoming policy
   community.general.ufw:
     direction: incoming

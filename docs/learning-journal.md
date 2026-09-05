@@ -227,5 +227,31 @@ Each completed task is documented here as evidence of hands-on experience.
 
 ---
 
+### Ticket #4: Centralized Logging with Loki + Alloy
+**Date:** 2026-09-01
+**Goal:** Centralize logs from all servers into Grafana using Loki and Alloy
+**Status:** completed
+
+**What was done:**
+- Created `loki` Ansible role (binary download, config, systemd service)
+- Created `alloy` Ansible role (GPG key, repo, package, config, service)
+- Configured Alloy to collect journal logs and forward to Loki
+- Added host labels to Alloy config for log filtering
+- Provisioned Loki as Grafana data source
+- Updated firewall to allow port 3100 from lab servers to monitor01
+
+**What was learned:**
+- Modern observability stack: Prometheus (metrics) + Loki (logs) + Grafana (visualization)
+- Alloy is Grafana's unified agent (replaces Promtail)
+- Label-based log indexing follows the same pattern as Prometheus metrics
+- Host labels are essential for filtering logs in Grafana (`{host="web01"}`)
+- Firewall rules need `when` conditions to target only the correct hosts
+
+**Issues encountered:**
+- Initially no host label on Alloy logs → couldn't filter by host in Grafana
+- Firewall rule for Loki missing `when: inventory_hostname == 'monitor01'` condition
+
+---
+
 *This journal is updated after each completed ticket.*
 *Entries show real work done, not just theory.*

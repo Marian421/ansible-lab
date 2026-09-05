@@ -1,0 +1,73 @@
+---
+
+- name: Create Loki group
+  ansible.builtin.group:
+    name: "{{ loki_group }}"
+    system: true
+
+- name: Create Loki User
+  ansible.builtin.user:
+    name: "{{ loki_user }}"
+    group: "{{ loki_group }}"
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: Create Loki directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ loki_user }}"
+    group: "{{ loki_group }}"
+    mode: '0755'
+  loop:
+    - "{{ loki_config_dir }}"
+    - "{{ loki_data_dir }}"
+    - "{{ loki_data_dir }}/chunks"
+    - "{{ loki_data_dir }}/rules"
+
+- name: Download Loki
+  ansible.builtin.get_url:
+    url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-amd64.zip"
+    dest: "/tmp/loki-{{ loki_version }}.zip"
+    mode: '0644'
+
+- name: Extract Loki
+  ansible.builtin.unarchive:
+    src: "/tmp/loki-{{ loki_version }}.zip"
+    dest: /tmp
+    remote_src: true
+
+- name: Install Loki binary
+  ansible.builtin.copy:
+    src: /tmp/loki-linux-amd64
+    dest: "{{ loki_binary }}"
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  notify: Restart Loki
+
+- name: Install Loki configuration
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ loki_config_dir }}/config.yml"
+    owner: "{{ loki_user }}"
+    group: "{{ loki_group }}"
+    mode: '0644'
+  notify: Restart Loki
+
+- name: Install Loki systemd service
+  ansible.builtin.template:
+    src: loki.service.j2
+    dest: /etc/systemd/system/loki.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Loki
+
+- name: Enable and start Loki
+  ansible.builtin.systemd_service:
+    name: loki
+    enabled: true
+    state: started
+    daemon_reload: true

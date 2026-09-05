@@ -12,9 +12,9 @@ At the start of a new conversation, say:
 
 ## Current State
 
-- **Last updated:** 2026-08-30
+- **Last updated:** 2026-09-01
 - **Lab status:** working
-- **Active learning module:** Module 4 - Centralized logging (NEXT)
+- **Active learning module:** Module 5 - Terraform (NEXT)
 
 ## Lab Topology
 
@@ -37,6 +37,7 @@ At the start of a new conversation, say:
 - [x] Module 1 - ansible.cfg + ansible-lint
 - [x] Module 2 - Grafana dashboards
 - [x] Module 3 - Alertmanager
+- [x] Module 4 - Centralized logging (Loki + Alloy)
 
 ## Ansible Roles
 
@@ -71,10 +72,9 @@ At the start of a new conversation, say:
 | 1 | ansible.cfg + ansible-lint | completed |
 | 2 | Grafana dashboards | completed |
 | 3 | Alertmanager | completed |
-| 4 | Centralized logging (rsyslog/journald remote) | not started |
-| 5 | Docker + Compose | not started |
-| 6 | GitHub Actions CI/CD | not started |
-| 7 | Terraform (libvirt provider) | not started |
+| 4 | Centralized logging (rsyslog/journald remote) | completed |
+| 5 | Terraform (libvirt provider) | not started |
+| 6 | Cloud (Terraform + provider) | not started |
 
 ## Session Log
 
@@ -106,3 +106,12 @@ At the start of a new conversation, say:
 - Updated Prometheus template with alerting and rule_files sections
 - Fixed var-naming lint issue (role variable prefix convention)
 - ansible-lint back to 5/5 stars
+
+### Session 3 - 2026-09-01
+- Completed Module 4: Centralized logging with Loki + Alloy
+- Created loki Ansible role (binary, config, systemd service)
+- Created alloy Ansible role (GPG key, repo, package, config, service)
+- Added host labels to Alloy config for log filtering
+- Provisioned Loki as Grafana data source
+- Fixed firewall rule (missing `when` condition for monitor01)
+- Logs from web01/storage01 visible in Grafana Explore

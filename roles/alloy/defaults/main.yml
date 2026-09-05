@@ -1,0 +1,7 @@
+---
+
+alloy_keyring_dir: /etc/apt/keyrings
+alloy_keyring_file: /etc/apt/keyrings/grafana.asc
+
+alloy_configuration_dir: /etc/alloy
+alloy_configuration_file: /etc/alloy/config.alloy
