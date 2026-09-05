@@ -61,6 +61,7 @@ Inbound: DENY by default (UFW)
 SSH:        bastion → all servers (TCP/22)
 NFS:        web01, monitor01 → storage01 (TCP/2049)
 Metrics:    monitor01 → web01, storage01 (TCP/9100)
+Logs:       web01, storage01 → monitor01 (TCP/3100)
 Everything else: DENY
 ```
 
@@ -83,11 +84,15 @@ The bastion is outside the `lab` group - it's SSH entry point, not a managed ser
 |------|-----------|---------|
 | healthcheck | lab | Systemd timer + script for health checks |
 | identity | lab | Users/groups with consistent UIDs |
+| firewall | lab | UFW rules, default-deny, source-restricted |
 | nfs_server | storage | NFS exports configuration |
 | nfs_client | nfs_clients | NFS mount points |
 | node_exporter | monitored | Prometheus metrics exporter |
-| prometheus | monitoring | Prometheus monitoring |
-| firewall | lab | UFW rules, default-deny |
+| prometheus | monitoring | Metrics collection, inventory-driven targets |
+| alertmanager | monitoring | Alert routing |
+| grafana | monitoring | Dashboards, provisioned data sources |
+| loki | monitoring | Log aggregation backend |
+| alloy | monitored | Journal log shipping to Loki |
 
 ## NFS Layout
 
@@ -99,21 +104,40 @@ storage01:
 
 NFSv4 over TCP/2049. Consistent UIDs/GIDs across servers ensure permissions work.
 
-## Monitoring Flow
+## Observability Flow
+
+Two independent pipelines, joined at Grafana.
 
 ```
-Node Exporter (web01, storage01)
-       │
-       │ HTTP :9100/metrics
-       ▼
-  Prometheus (monitor01)
-       │
-       │ scrape every 15s
-       ▼
-  Stored metrics
-       │
-       ▼ (future: Grafana dashboards)
+METRICS                                 LOGS
+
+Node Exporter :9100                     systemd journal
+(web01, storage01, monitor01)           (web01, storage01)
+       │                                       │
+       │ scraped every 15s                     │ collected by Alloy
+       ▼                                       │ push :3100
+  Prometheus (monitor01)                       ▼
+       │                                  Loki (monitor01)
+       │ evaluates alert rules                 │
+       ▼                                       │
+  Alertmanager (monitor01)                     │
+       │ routes / groups / silences            │
+       │                                       │
+       └──────────► Grafana ◄──────────────────┘
+                   (monitor01)
+                        │
+                        ▼
+              SSH tunnel :3000 → laptop
 ```
+
+Scrape targets are generated from the `monitored` inventory group, so adding a host to that
+group is sufficient for Prometheus to begin scraping it.
+
+Alert rules are validated with `promtool check rules` through the Ansible template `validate:`
+hook, so an invalid rule fails the play rather than breaking Prometheus at restart.
+
+Logs carry a `host` label applied by Alloy, which is what makes `{host="web01"}` filtering work
+in Grafana Explore.
 
 ## Healthcheck Flow
 

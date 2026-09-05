@@ -12,9 +12,9 @@ At the start of a new conversation, say:
 
 ## Current State
 
-- **Last updated:** 2026-09-01
+- **Last updated:** 2026-09-05
 - **Lab status:** working
-- **Active learning module:** Module 5 - Terraform (NEXT)
+- **Active learning module:** Phase 0 - repo cleanup & visibility, then Kubernetes (k3s)
 
 ## Lab Topology
 
@@ -45,11 +45,15 @@ At the start of a new conversation, say:
 |------|-----------|---------|
 | healthcheck | all lab servers | Systemd timer + script for health checks |
 | identity | all lab servers | Users/groups with consistent UIDs |
+| firewall | all lab servers | UFW rules, default-deny, source-restricted |
 | nfs_server | storage01 | NFS exports configuration |
 | nfs_client | web01, monitor01 | NFS mount points |
-| node_exporter | web01, storage01 | Prometheus metrics exporter |
-| prometheus | monitor01 | Prometheus monitoring |
-| firewall | all lab servers | UFW rules, default-deny |
+| node_exporter | all lab servers | Prometheus metrics exporter |
+| prometheus | monitor01 | Metrics collection, inventory-driven targets |
+| alertmanager | monitor01 | Alert routing |
+| grafana | monitor01 | Dashboards, provisioned data sources |
+| loki | monitor01 | Log aggregation backend |
+| alloy | web01, storage01 | Journal log shipping to Loki |
 
 ## Key Decisions
 
@@ -61,9 +65,19 @@ At the start of a new conversation, say:
 
 ## Known Issues
 
-- Inventory hosts use bare names without `ansible_host` - needs SSH config or explicit IPs
-- Healthcheck role has duplicate files (static .sh in files/ AND .j2 in templates/) - should pick one
-- `firewall_bastion_ip` is hardcoded in role defaults, should be in group_vars
+All previously listed issues are resolved (2026-09-05):
+
+- ~~Healthcheck role has duplicate files~~ - removed the unused static
+  `files/lab-healthcheck.sh`; the Jinja2 template is the single source
+- ~~`firewall_bastion_ip` hardcoded in role defaults~~ - moved to `group_vars/lab.yml`
+- ~~Inventory hosts use bare names without `ansible_host`~~ - **this was not actually a bug.**
+  The SSH client config defines `Host web01` etc. with `ProxyJump bastion`. Setting
+  `ansible_host` to a raw IP would stop those blocks from matching and break ProxyJump. The
+  bare names are intentional; the requirement is now documented in `README.md` instead.
+
+Also cleaned up: leftover `debug` tasks in the `firewall` and `healthcheck` roles and in
+`first-playbook.yml`; boilerplate `vars/main.yml` files; ansible-galaxy placeholder READMEs
+replaced with real documentation for all 11 roles.
 
 ## Learning Module Plan
 
@@ -73,8 +87,17 @@ At the start of a new conversation, say:
 | 2 | Grafana dashboards | completed |
 | 3 | Alertmanager | completed |
 | 4 | Centralized logging (rsyslog/journald remote) | completed |
-| 5 | Terraform (libvirt provider) | not started |
-| 6 | Cloud (Terraform + provider) | not started |
+| 5 | ~~Terraform (libvirt provider)~~ | **superseded** - see below |
+| 6 | Kubernetes (k3s on the lab VMs) | not started |
+| 7 | Terraform against Azure + AZ-104 | not started |
+| 8 | CI/CD, Molecule, secrets management | not started |
+
+**Why Module 5 changed:** `MODULE-5.md` targeted the `dmacvicar/libvirt` Terraform provider.
+The IaC concepts are right, but that provider appears in essentially no job postings and the
+lab VMs already exist. The same concepts against Azure cost the same effort, produce a
+recognisable portfolio artefact and overlap directly with AZ-104. The VMs are more useful
+hosting a real k3s cluster than being re-declared in HCL.
+Full plan: `~/.claude/plans/please-review-this-learning-shimmering-kernighan.md`
 
 ## Session Log
 
@@ -115,3 +138,15 @@ At the start of a new conversation, say:
 - Provisioned Loki as Grafana data source
 - Fixed firewall rule (missing `when` condition for monitor01)
 - Logs from web01/storage01 visible in Grafana Explore
+
+### Session 4 - 2026-09-05
+- Reviewed the whole learning path against the goal of getting hired
+- Repo cleanup: removed unused `files/lab-healthcheck.sh`, leftover debug tasks, and
+  boilerplate `vars/main.yml` files
+- Moved `firewall_bastion_ip` from role defaults into `group_vars/lab.yml`
+- Wrote real READMEs for all 11 roles (were ansible-galaxy placeholders or absent)
+- Rewrote `README.md` and updated `docs/architecture.md` to cover the full observability stack
+- Established that the `ansible_host` "known issue" was not a bug - documented the SSH config
+  requirement instead
+- `ansible-lint` still 5/5; `--syntax-check` passes
+- Module 5 (Terraform/libvirt) superseded in favour of k3s, then Terraform on Azure

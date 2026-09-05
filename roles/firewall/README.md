@@ -1,38 +1,36 @@
-Role Name
-=========
+# `firewall`
 
-A brief description of the role goes here.
+Applies a default-deny UFW policy with source-restricted rules.
 
-Requirements
-------------
+## What it does
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Every rule is restricted by **source address**, not merely by port. Source IPs are resolved at
+run time from other hosts' gathered facts via `hostvars`, so the rules follow the inventory.
 
-Role Variables
---------------
+## Role variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+| Variable | Default | Description |
+| --- | --- | --- |
+| `firewall_bastion_ip` | *(set in `group_vars/lab.yml`)* | Only source permitted to reach SSH |
+| `firewall_ssh_port` | `22` | SSH |
+| `firewall_nfs_port` | `2049` | NFSv4 |
+| `firewall_alloy_port` | `3100` | Loki ingest |
+| `firewall_node_exporter_port` | `9100` | Node Exporter scrape |
+| `firewall_default_incoming_policy` | `deny` | Default inbound policy |
+| `firewall_default_outgoing_policy` | `allow` | Default outbound policy |
 
-Dependencies
-------------
+## Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+**Requires facts from every referenced host.** Running with `--limit` skips fact gathering for
+the hosts that are excluded, leaving `hostvars[...]` undefined and the rules wrong. Run this
+role against the whole `lab` group.
 
-Example Playbook
-----------------
+## Example
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```yaml
+- name: Configure firewall
+  hosts: lab
+  become: true
+  roles:
+    - firewall
+```
