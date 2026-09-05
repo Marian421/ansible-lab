@@ -4,7 +4,5 @@ firewall_nfs_port: 2049
 firewall_alloy_port: 3100
 firewall_node_exporter_port: 9100
 
-firewall_bastion_ip: "192.168.122.10"
-
 firewall_default_incoming_policy: deny
 firewall_default_outgoing_policy: allow

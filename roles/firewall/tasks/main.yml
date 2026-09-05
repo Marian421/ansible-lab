@@ -12,11 +12,6 @@
     port: "{{ firewall_ssh_port }}"
     proto: tcp
 
-- name: Debug monitor01 hostvars
-  ansible.builtin.debug:
-    var: hostvars['monitor01']
-  run_once: true
-
 - name: Allow Node Exporter from monitor01
   community.general.ufw:
     rule: allow
@@ -40,7 +35,6 @@
     port: "{{ firewall_nfs_port }}"
     proto: tcp
   when: inventory_hostname == "storage01"
-
 
 - name: Allow Loki from lab servers
   community.general.ufw:

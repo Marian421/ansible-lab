@@ -39,12 +39,3 @@
     name: "{{ healthcheck_timer }}"
     enabled: true
     state: started
-
-- name: Show storage server message
-  ansible.builtin.debug:
-    msg: "This is the storage server"
-  when: "'storage' in group_names"
-
-- name: Show server role
-  ansible.builtin.debug:
-    msg: "This server's role is {{ server_role }}"

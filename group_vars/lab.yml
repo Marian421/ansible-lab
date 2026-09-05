@@ -4,3 +4,6 @@ healthcheck_script: /usr/local/bin/lab-healthcheck.sh
 healthcheck_service: lab-healthcheck.service
 healthcheck_timer: lab-healthcheck.timer
 developers_gid: 1003
+
+# Firewall — site-specific, consumed by the firewall role
+firewall_bastion_ip: "192.168.122.10"
