@@ -149,4 +149,5 @@ Grafana, Prometheus and Alertmanager are never exposed — they are reached over
 - [`docs/architecture.md`](docs/architecture.md) — topology, data flows, inventory groups
 - [`docs/learning-journal.md`](docs/learning-journal.md) — build log, including the problems hit
   and how they were diagnosed
+- [`ROADMAP.md`](ROADMAP.md) — the learning path: Docker, Kubernetes, Terraform, Azure
 - [`CONTEXT.md`](CONTEXT.md) — current state and module progress

@@ -12,9 +12,10 @@ At the start of a new conversation, say:
 
 ## Current State
 
-- **Last updated:** 2026-09-05
+- **Last updated:** 2026-09-06
 - **Lab status:** working
-- **Active learning module:** Module 6 - Docker fundamentals (see MODULE-6.md)
+- **Active learning module:** Module 6 - Docker fundamentals (see `MODULE-6.md`)
+- **Full plan:** [`ROADMAP.md`](ROADMAP.md) - Docker to AZ-104, task by task
 
 ## Lab Topology
 
@@ -81,24 +82,26 @@ replaced with real documentation for all 11 roles.
 
 ## Learning Module Plan
 
+[`ROADMAP.md`](ROADMAP.md) is the plan of record - task lists, hour estimates, verification
+criteria and the reasoning behind each choice. Only the status lives here.
+
 | # | Module | Status |
 |---|--------|--------|
 | 1 | ansible.cfg + ansible-lint | completed |
 | 2 | Grafana dashboards | completed |
 | 3 | Alertmanager | completed |
-| 4 | Centralized logging (rsyslog/journald remote) | completed |
-| 5 | ~~Terraform (libvirt provider)~~ | **superseded** - see below |
-| 6 | Docker fundamentals (layers, multi-stage, volumes) | **next** |
-| 7 | Kubernetes (k3s on the lab VMs) | not started |
-| 8 | Terraform against Azure + AZ-104 | not started |
-| 9 | CI/CD, Molecule, secrets management | not started |
+| 4 | Centralized logging (Loki + Alloy) | completed |
+| 5 | ~~Terraform (libvirt provider)~~ | superseded - see `ROADMAP.md` |
+| 6 | Docker fundamentals | **current** - `MODULE-6.md` |
+| 7 | Kubernetes on k3s | next - `MODULE-7.md` |
+| 8 | Terraform on Azure | not started |
+| 9 | AZ-104 | not started |
+| 10 | CI/CD, Molecule, secrets, capstone | not started |
 
-**Why Module 5 changed:** `MODULE-5.md` targeted the `dmacvicar/libvirt` Terraform provider.
-The IaC concepts are right, but that provider appears in essentially no job postings and the
-lab VMs already exist. The same concepts against Azure cost the same effort, produce a
-recognisable portfolio artefact and overlap directly with AZ-104. The VMs are more useful
-hosting a real k3s cluster than being re-declared in HCL.
-Full plan: `~/.claude/plans/please-review-this-learning-shimmering-kernighan.md`
+Tasks are addressed as `<module>.<task>`, so a session can begin with "let's do 7.3".
+
+Modules 8-10 get a detailed `MODULE-N.md` written when they start, not in advance - cloud
+tooling moves and stale instructions are worse than none.
 
 ## Session Log
 
@@ -141,7 +144,7 @@ Full plan: `~/.claude/plans/please-review-this-learning-shimmering-kernighan.md`
 - Logs from web01/storage01 visible in Grafana Explore
 
 ### Session 4 - 2026-09-05
-- Reviewed the whole learning path against the goal of getting hired
+- Reviewed the whole learning path end to end and re-targeted the remaining modules
 - Repo cleanup: removed unused `files/lab-healthcheck.sh`, leftover debug tasks, and
   boilerplate `vars/main.yml` files
 - Moved `firewall_bastion_ip` from role defaults into `group_vars/lab.yml`
@@ -151,3 +154,16 @@ Full plan: `~/.claude/plans/please-review-this-learning-shimmering-kernighan.md`
   requirement instead
 - `ansible-lint` still 5/5; `--syntax-check` passes
 - Module 5 (Terraform/libvirt) superseded in favour of k3s, then Terraform on Azure
+
+### Session 5 - 2026-09-06
+- Wrote `ROADMAP.md`: the full path from Docker through Kubernetes and Terraform to AZ-104,
+  with task IDs, hour estimates and verification criteria for each module
+- Wrote `MODULE-7.md` (Kubernetes on k3s) in detail; modules 8-10 stay at task-list level
+  until they start
+- **Revised the cluster topology to 2 nodes.** Measured host memory: 14 GiB total with under
+  1 GiB free, and `monitor01` already at 1.5 GB of its 2 GB ceiling running Prometheus,
+  Alertmanager, Grafana and Loki. k3s server goes on `web01`, agent on `storage01`, and
+  `monitor01` stays outside the cluster as the observability plane - which is the correct
+  architecture independently of the memory constraint
+- Decided Terraform/Azure gets its own repository (`azure-terraform-lab`), created at task 8.1
+  rather than now; Kubernetes work stays in this repo
