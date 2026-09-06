@@ -14,7 +14,7 @@ At the start of a new conversation, say:
 
 - **Last updated:** 2026-09-05
 - **Lab status:** working
-- **Active learning module:** Phase 0 - repo cleanup & visibility, then Kubernetes (k3s)
+- **Active learning module:** Module 6 - Docker fundamentals (see MODULE-6.md)
 
 ## Lab Topology
 
@@ -88,9 +88,10 @@ replaced with real documentation for all 11 roles.
 | 3 | Alertmanager | completed |
 | 4 | Centralized logging (rsyslog/journald remote) | completed |
 | 5 | ~~Terraform (libvirt provider)~~ | **superseded** - see below |
-| 6 | Kubernetes (k3s on the lab VMs) | not started |
-| 7 | Terraform against Azure + AZ-104 | not started |
-| 8 | CI/CD, Molecule, secrets management | not started |
+| 6 | Docker fundamentals (layers, multi-stage, volumes) | **next** |
+| 7 | Kubernetes (k3s on the lab VMs) | not started |
+| 8 | Terraform against Azure + AZ-104 | not started |
+| 9 | CI/CD, Molecule, secrets management | not started |
 
 **Why Module 5 changed:** `MODULE-5.md` targeted the `dmacvicar/libvirt` Terraform provider.
 The IaC concepts are right, but that provider appears in essentially no job postings and the
