@@ -5,7 +5,12 @@ __pycache__/
 *.log
 .ansible/
 
-# Temp files
+# Private planning notes — kept local, never published.
+# The public repo documents what was built; the curriculum and progress
+# tracking are working notes and stay out of it.
+ROADMAP.md
+CONTEXT.md
+MODULE-*.md
 template.md
 
 # Ansible Vault
