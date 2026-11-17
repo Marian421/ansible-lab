@@ -4,7 +4,7 @@ Installs Grafana and provisions its data sources.
 
 ## What it does
 
-Adds the Grafana APT repository with GPG key verification, installs the package, and templates
+Installs the package from the Grafana APT repository (added by `grafana_apt_repo`), and templates
 data-source provisioning files so Prometheus and Loki are configured on first start — no
 clicking through the UI.
 
@@ -17,7 +17,8 @@ clicking through the UI.
 
 ## Dependencies
 
-Requires `prometheus`; `loki` is provisioned as a second data source.
+Requires `prometheus`; `loki` is provisioned as a second data source. Pulls in
+`grafana_apt_repo` (`meta/main.yml`) for the package repository.
 
 ## Example
 

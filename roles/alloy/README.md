@@ -12,12 +12,12 @@ and forwards to Loki, attaching a `host` label so logs are filterable per machin
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `alloy_keyring_dir` / `alloy_keyring_file` | `/etc/apt/keyrings` | APT keyring location for the Grafana repo |
 | `alloy_configuration_dir` / `alloy_configuration_file` | `/etc/alloy`, `/etc/alloy/config.alloy` | Configuration paths |
 
 ## Dependencies
 
-Requires a reachable `loki` endpoint.
+Requires a reachable `loki` endpoint. Pulls in `grafana_apt_repo` (`meta/main.yml`) for the
+package repository.
 
 ## Example
 

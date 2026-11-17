@@ -1,0 +1,6 @@
+---
+
+grafana_apt_repo_key_url: https://apt.grafana.com/gpg.key
+grafana_apt_repo_keyring_dir: /etc/apt/keyrings
+grafana_apt_repo_keyring_file: /etc/apt/keyrings/grafana.asc
+grafana_apt_repo_url: https://apt.grafana.com

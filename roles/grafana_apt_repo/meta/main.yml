@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Marian421
+  description: Adds the Grafana APT repository and its signing key, once per host
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+
+dependencies: []

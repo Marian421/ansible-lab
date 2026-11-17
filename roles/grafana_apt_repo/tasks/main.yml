@@ -1,0 +1,30 @@
+---
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - gpg
+    state: present
+    update_cache: true
+
+- name: Create Key directory
+  ansible.builtin.file:
+    path: "{{ grafana_apt_repo_keyring_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download Grafana GPG key
+  ansible.builtin.get_url:
+    url: "{{ grafana_apt_repo_key_url }}"
+    dest: "{{ grafana_apt_repo_keyring_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add Grafana APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ grafana_apt_repo_keyring_file }}] {{ grafana_apt_repo_url }} stable main"
+    filename: grafana
+    state: present

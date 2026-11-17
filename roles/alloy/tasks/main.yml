@@ -1,35 +1,14 @@
 ---
 
-- name: Install prerequisites
-  ansible.builtin.apt:
-    name: gpg
-    state: present
-    update_cache: true
+# The Grafana APT repository comes from the grafana_apt_repo dependency (meta/main.yml).
 
-- name: Create Alloy directories
+- name: Create Alloy configuration directory
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ alloy_configuration_dir }}"
     state: directory
     owner: root
     group: root
     mode: '0755'
-  loop:
-    - "{{ alloy_keyring_dir }}"
-    - "{{ alloy_configuration_dir }}"
-
-- name: Download Grafana GPG key
-  ansible.builtin.get_url:
-    url: "https://apt.grafana.com/gpg-full.key"
-    dest: "{{ alloy_keyring_file }}"
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Add Grafana APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by={{ alloy_keyring_file }}] https://apt.grafana.com stable main"
-    filename: grafana
-    state: present
 
 - name: Install Alloy
   ansible.builtin.apt:
