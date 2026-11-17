@@ -11,7 +11,7 @@ Uses `ansible.posix.mount` with `state: mounted`, which creates the mount point 
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `nfs_client_nfs_server` | `storage01` | Host serving the exports |
+| `nfs_client_nfs_server` | `storage01` | Host serving the exports. The lab sets the full DNS name `storage01.dev.lab.test` in `group_vars/lab.yml`: a one-word name is not resolved by the VMs |
 | `nfs_client_nfs_mounts` | `shared`, `projects` | List of `{name, export, mount_point}` |
 
 ## Dependencies

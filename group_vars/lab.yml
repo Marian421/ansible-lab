@@ -6,4 +6,6 @@ healthcheck_timer: lab-healthcheck.timer
 developers_gid: 1003
 
 # Firewall — site-specific, consumed by the firewall role
-firewall_bastion_ip: "192.168.122.10"
+firewall_bastion_ip: "192.168.150.10"
+
+nfs_client_nfs_server: storage01.dev.lab.test
