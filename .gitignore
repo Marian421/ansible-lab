@@ -12,6 +12,7 @@ ROADMAP.md
 CONTEXT.md
 MODULE-*.md
 template.md
+.breakfix/
 
 # Ansible Vault
 *.vault_password
