@@ -1,5 +1,12 @@
 ---
 
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name: unzip
+    state: present
+    update_cache: true
+
+
 - name: Create Loki group
   ansible.builtin.group:
     name: "{{ loki_group }}"
