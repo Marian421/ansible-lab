@@ -4,7 +4,7 @@ A four-node Linux environment on KVM/libvirt, configured entirely through Ansibl
 storage, a default-deny firewall, and a full metrics-and-logs observability stack. Built as a
 self-directed lab to practise infrastructure automation end to end.
 
-**11 idempotent Ansible roles · `ansible-lint` clean at 5/5 (production profile)**
+**12 idempotent Ansible roles · `ansible-lint` clean at 5/5 (production profile)**
 
 ```
                         Ansible controller
@@ -12,7 +12,7 @@ self-directed lab to practise infrastructure automation end to end.
                                 │ SSH (ProxyJump)
                                 ▼
                           ┌───────────┐
-                          │  bastion  │  192.168.122.10
+                          │  bastion  │  192.168.150.10
                           └─────┬─────┘
               ┌─────────────────┼─────────────────┐
               ▼                 ▼                 ▼
@@ -23,7 +23,7 @@ self-directed lab to practise infrastructure automation end to end.
       │ NFS client   │  │ NFS server   │  │ Prometheus   │
       │ Node Exporter│  │ Node Exporter│  │ Alertmanager │
       │ Alloy        │  │ Alloy        │  │ Grafana      │
-      │              │  │              │  │ Loki         │
+      │              │  │              │  │ Loki, Alloy  │
       └──────┬───────┘  └──────▲───────┘  └──────┬───────┘
              │  NFSv4          │                 │
              └─────────────────┘                 │
@@ -35,12 +35,12 @@ self-directed lab to practise infrastructure automation end to end.
 
 | Area | Detail |
 | --- | --- |
-| **Configuration management** | 11 idempotent Ansible roles with defaults, handlers, templates and conditionals |
+| **Configuration management** | 12 idempotent Ansible roles with defaults, handlers, templates and conditionals |
 | **Observability** | Prometheus + Alertmanager + Grafana + Loki + Alloy, all deployed and provisioned via Ansible |
 | **Shared storage** | NFSv4 exports with UID/GID consistency enforced across every host |
 | **Security** | UFW default-deny inbound; every rule restricted by source address, not just port |
 | **Service management** | systemd oneshot units and timers for scheduled health checks |
-| **Virtualisation** | KVM/QEMU/libvirt, static addressing, SSH access via a bastion (ProxyJump) |
+| **Virtualisation** | VMs provisioned with Terraform on KVM/libvirt ([`terraform-kvm-lab`](https://github.com/Marian421/terraform-kvm-lab)), DHCP-reserved addresses and DNS names, SSH access via a bastion (ProxyJump) |
 
 Three details worth pointing at:
 
@@ -56,10 +56,10 @@ Three details worth pointing at:
 
 | Host | IP | Role |
 | --- | --- | --- |
-| `bastion` | 192.168.122.10 | SSH jump host — entry point, deliberately not a managed node |
-| `web01` | 192.168.122.20 | Web server, NFS client, Node Exporter, Alloy |
-| `storage01` | 192.168.122.30 | NFS server, Node Exporter, Alloy |
-| `monitor01` | 192.168.122.40 | Prometheus, Alertmanager, Grafana, Loki, NFS client |
+| `bastion` | 192.168.150.10 | SSH jump host — entry point, deliberately not a managed node |
+| `web01` | 192.168.150.20 | Web server, NFS client, Node Exporter, Alloy |
+| `storage01` | 192.168.150.30 | NFS server, Node Exporter, Alloy |
+| `monitor01` | 192.168.150.40 | Prometheus, Alertmanager, Grafana, Loki, Alloy, NFS client |
 
 ## Roles
 
@@ -74,12 +74,15 @@ Three details worth pointing at:
 | [`prometheus`](roles/prometheus) | `monitoring` | Metrics collection, inventory-driven targets, validated rules |
 | [`alertmanager`](roles/alertmanager) | `monitoring` | Alert routing (`InstanceDown`, `DiskSpaceLow`) |
 | [`grafana`](roles/grafana) | `monitoring` | Dashboards with provisioned data sources |
+| [`grafana_apt_repo`](roles/grafana_apt_repo) | dependency of `grafana`, `alloy` | The Grafana APT repository and signing key, defined once |
 | [`loki`](roles/loki) | `monitoring` | Log aggregation backend |
 | [`alloy`](roles/alloy) | `monitored` | Journal log shipping to Loki, with per-host labels |
 
 ## Requirements
 
-- A libvirt/KVM host with the four VMs reachable on `192.168.122.0/24`
+- The four VMs from [`terraform-kvm-lab`](https://github.com/Marian421/terraform-kvm-lab)'s `dev`
+  environment on `192.168.150.0/24`. Its network gives each VM a DNS name
+  (`<host>.dev.lab.test`), which the NFS clients use to find `storage01`.
 - Ansible with the collections in `requirements.yml`:
   `ansible-galaxy collection install -r requirements.yml`
 - **SSH client configuration defining the host aliases.** The inventory uses bare hostnames, so
@@ -88,12 +91,12 @@ Three details worth pointing at:
 
   ```sshconfig
   Host bastion
-      HostName 192.168.122.10
+      HostName 192.168.150.10
       User john
       IdentityFile ~/.ssh/id_ed25519_lab
 
   Host web01
-      HostName 192.168.122.20
+      HostName 192.168.150.20
       User john
       IdentityFile ~/.ssh/id_ed25519_lab
       ProxyJump bastion
@@ -143,6 +146,25 @@ Everything else: DENY
 ```
 
 Grafana, Prometheus and Alertmanager are never exposed — they are reached over an SSH tunnel.
+
+## Things I ran into
+
+Moving the lab from hand-built VMs to Terraform-built ones (empty Debian cloud images, rebuilt
+from code) showed what the old VMs had picked up by hand and no file recorded:
+
+- **DNS names.** NFS failed with `Failed to resolve server storage01`. The old libvirt network
+  had hostnames on its DHCP reservations, added by hand; the new one had none, so libvirt's
+  dnsmasq answered from the host's `/etc/hosts`, which still held the old addresses. Fixed in
+  Terraform (hostnames in the reservations) and by using the full name
+  `storage01.dev.lab.test` in `group_vars/lab.yml`.
+- **`unzip`.** The `loki` role extracts a `.zip` and the cloud image has no `unzip`. The role now
+  installs it first.
+- **Two roles, one APT source, two keys.** `grafana` and `alloy` each added `apt.grafana.com`
+  with a different key file. Only `monitor01` runs both, and there apt refused to read any
+  sources. The repository moved into `grafana_apt_repo`, which both roles depend on.
+- **Healthcheck on a first run.** The healthcheck handler runs the check in the first play,
+  before the NFS client play has mounted anything, so a fresh build fails on `web01` and
+  `monitor01` the first time. Still open.
 
 ## Documentation
 

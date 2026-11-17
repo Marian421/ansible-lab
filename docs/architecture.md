@@ -46,12 +46,16 @@ Multi-server infrastructure lab for practicing Linux administration, automation,
 
 | Host | IP | Role |
 |------|----|------|
-| bastion | 192.168.122.10 | SSH jump host, firewall gateway |
-| web01 | 192.168.122.20 | Web server, NFS client, Node Exporter |
-| storage01 | 192.168.122.30 | NFS server, Node Exporter |
-| monitor01 | 192.168.122.40 | Prometheus, NFS client, monitoring |
+| bastion | 192.168.150.10 | SSH jump host, firewall gateway |
+| web01 | 192.168.150.20 | Web server, NFS client, Node Exporter |
+| storage01 | 192.168.150.30 | NFS server, Node Exporter |
+| monitor01 | 192.168.150.40 | Prometheus, NFS client, monitoring |
 
-All hosts on `192.168.122.0/24` (KVM default NAT network).
+All hosts on `192.168.150.0/24`, the libvirt NAT network `tf-dev` created by
+[`terraform-kvm-lab`](https://github.com/Marian421/terraform-kvm-lab). Addresses are DHCP
+reservations keyed on fixed MAC addresses; the same reservations give each VM a DNS name,
+`<host>.dev.lab.test`, served by libvirt's dnsmasq on `192.168.150.1`. NFS clients mount
+`storage01.dev.lab.test`.
 
 ## Security Model
 
@@ -91,6 +95,7 @@ The bastion is outside the `lab` group - it's SSH entry point, not a managed ser
 | prometheus | monitoring | Metrics collection, inventory-driven targets |
 | alertmanager | monitoring | Alert routing |
 | grafana | monitoring | Dashboards, provisioned data sources |
+| grafana_apt_repo | dependency of grafana, alloy | Grafana APT repository and key, defined once |
 | loki | monitoring | Log aggregation backend |
 | alloy | monitored | Journal log shipping to Loki |
 
@@ -112,7 +117,7 @@ Two independent pipelines, joined at Grafana.
 METRICS                                 LOGS
 
 Node Exporter :9100                     systemd journal
-(web01, storage01, monitor01)           (web01, storage01)
+(web01, storage01, monitor01)           (web01, storage01, monitor01)
        │                                       │
        │ scraped every 15s                     │ collected by Alloy
        ▼                                       │ push :3100
